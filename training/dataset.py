@@ -243,8 +243,40 @@ class ImageFolderDataset(Dataset):
             self.img_list = all_img_list
             self.mask_list = all_mask_list
 
+        elif data_camera_mode == 'relief':
+            print('==> use relief data')
+            folder_list = sorted(os.listdir(root))
+            split_name = './3dgan_data_split/relief/%s.txt' % (split)
+            if split == 'all':
+                split_name = './3dgan_data_split/relief.txt'
+
+            valid_folder_list = []
+            with open(split_name, 'r') as f:
+                all_line = f.readlines()
+                for l in all_line:
+                    valid_folder_list.append(l.strip())
+            valid_folder_list = set(valid_folder_list)
+            useful_folder_list = set(folder_list).intersection(valid_folder_list)
+            folder_list = sorted(list(useful_folder_list))
+
+            print('==> use shapenet folder number %s' % (len(folder_list)))
+            folder_list = [os.path.join(root, f) for f in folder_list]
+            all_img_list = []
+            all_mask_list = []
+
+            for folder in folder_list:
+                rgb_list = sorted(os.listdir(folder))
+                rgb_list = [n for n in rgb_list if n.endswith('.png') or n.endswith('.jpg')]
+                rgb_file_name_list = [os.path.join(folder, n) for n in rgb_list]
+                all_img_list.extend(rgb_file_name_list)
+                all_mask_list.extend(rgb_list)
+
+            self.img_list = all_img_list
+            self.mask_list = all_mask_list
+
         else:
             raise NotImplementedError
+
         self.img_size = resolution
         self._type = 'dir'
         self._all_fnames = self.img_list
