@@ -317,9 +317,9 @@ class ImageFolderDataset(Dataset):
     def __getitem__(self, idx):
         fname = self._image_fnames[self._raw_idx[idx]]
         if self.data_camera_mode == 'shapenet_car' or self.data_camera_mode == 'shapenet_chair' \
-                or self.data_camera_mode == 'renderpeople' \
-                or self.data_camera_mode == 'shapenet_motorbike' or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
-                :
+                or self.data_camera_mode == 'renderpeople'  or self.data_camera_mode == 'shapenet_motorbike' \
+                or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
+                or self.data_camera_mode == 'relief':
             ori_img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             img = ori_img[:, :, :3][..., ::-1]
             mask = ori_img[:, :, 3:4]
