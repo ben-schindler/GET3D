@@ -318,8 +318,7 @@ class ImageFolderDataset(Dataset):
         fname = self._image_fnames[self._raw_idx[idx]]
         if self.data_camera_mode == 'shapenet_car' or self.data_camera_mode == 'shapenet_chair' \
                 or self.data_camera_mode == 'renderpeople'  or self.data_camera_mode == 'shapenet_motorbike' \
-                or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
-                or self.data_camera_mode == 'relief':
+                or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal':
             ori_img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             img = ori_img[:, :, :3][..., ::-1]
             mask = ori_img[:, :, 3:4]
@@ -331,8 +330,7 @@ class ImageFolderDataset(Dataset):
 
             if self.data_camera_mode == 'shapenet_car' or self.data_camera_mode == 'shapenet_chair' \
                     or self.data_camera_mode == 'renderpeople' or self.data_camera_mode == 'shapenet_motorbike' \
-                    or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
-                    or self.data_camera_mode == 'relief':
+                    or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal':
                 if not os.path.exists(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy')):
                     print('==> not found camera root: ', os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy'))
                 else:
@@ -340,6 +338,25 @@ class ImageFolderDataset(Dataset):
                     elevation_camera = np.load(os.path.join(self.camera_root, syn_idx, obj_idx, 'elevation.npy'))
                     condinfo[0] = rotation_camera[img_idx] / 180 * np.pi
                     condinfo[1] = (90 - elevation_camera[img_idx]) / 180.0 * np.pi
+        elif self.data_camera_mode == 'relief':
+            ori_img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+            img = ori_img[:, :, :3][..., ::-1]
+            mask = ori_img[:, :, 3:4]
+            condinfo = np.zeros(2)
+            fname_list = fname.split('/')
+            img_idx = int(fname_list[-1].split('.')[0])
+            obj_idx = fname_list[-2]
+            #syn_idx = fname_list[-3]
+
+            if not os.path.exists(os.path.join(self.camera_root, obj_idx, 'rotation.npy')):
+                print('==> not found camera root: ', os.path.join(self.camera_root, obj_idx, 'rotation.npy'))
+            else:
+                rotation_camera = np.load(os.path.join(self.camera_root, obj_idx, 'rotation.npy'))
+                elevation_camera = np.load(os.path.join(self.camera_root, obj_idx, 'elevation.npy'))
+                condinfo[0] = rotation_camera[img_idx] / 180 * np.pi
+                condinfo[1] = (90 - elevation_camera[img_idx]) / 180.0 * np.pi
+
+
         else:
             raise NotImplementedError
 
