@@ -331,7 +331,8 @@ class ImageFolderDataset(Dataset):
 
             if self.data_camera_mode == 'shapenet_car' or self.data_camera_mode == 'shapenet_chair' \
                     or self.data_camera_mode == 'renderpeople' or self.data_camera_mode == 'shapenet_motorbike' \
-                    or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal':
+                    or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
+                    or self.data_camera_mode == 'relief':
                 if not os.path.exists(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy')):
                     print('==> not found camera root')
                 else:
