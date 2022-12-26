@@ -110,7 +110,8 @@ class StyleGAN2Loss(Loss):
                         or self.G.synthesis.data_camera_mode == 'shapenet_motorbike' or self.G.synthesis.data_camera_mode == 'renderpeople' or \
                         self.G.synthesis.data_camera_mode == 'shapenet_plant' or self.G.synthesis.data_camera_mode == 'shapenet_vase' or \
                         self.G.synthesis.data_camera_mode == 'ts_house' or self.G.synthesis.data_camera_mode == 'ts_animal' or \
-                        self.G.synthesis.data_camera_mode == 'all_shapenet':
+                        self.G.synthesis.data_camera_mode == 'all_shapenet' or \
+                        self.G.synthesis.data_camera_mode == 'relief':
                     camera_condition = torch.cat((gen_camera[-2], gen_camera[-1]), dim=-1)
                 else:
                     assert NotImplementedError
@@ -154,7 +155,8 @@ class StyleGAN2Loss(Loss):
                         or self.G.synthesis.data_camera_mode == 'shapenet_motorbike' or self.G.synthesis.data_camera_mode == 'renderpeople' or \
                         self.G.synthesis.data_camera_mode == 'shapenet_plant' or self.G.synthesis.data_camera_mode == 'shapenet_vase' or \
                         self.G.synthesis.data_camera_mode == 'ts_house' or self.G.synthesis.data_camera_mode == 'ts_animal' or \
-                        self.G.synthesis.data_camera_mode == 'all_shapenet':
+                        self.G.synthesis.data_camera_mode == 'all_shapenet' or \
+                        self.G.synthesis.data_camera_mode == 'relief':
                     camera_condition = torch.cat((gen_camera[-2], gen_camera[-1]), dim=-1)
                 else:
                     camera_condition = None
