@@ -334,7 +334,7 @@ class ImageFolderDataset(Dataset):
                     or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
                     or self.data_camera_mode == 'relief':
                 if not os.path.exists(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy')):
-                    print('==> not found camera root')
+                    print('==> not found camera root: ', os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy'))
                 else:
                     rotation_camera = np.load(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy'))
                     elevation_camera = np.load(os.path.join(self.camera_root, syn_idx, obj_idx, 'elevation.npy'))
