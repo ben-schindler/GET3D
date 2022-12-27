@@ -10,6 +10,8 @@ import math
 import numpy as np
 from training.math_utils_torch import *
 
+import global_variables
+
 
 def create_camera_from_angle(phi, theta, sample_r, device='cuda'):
     '''
@@ -61,6 +63,14 @@ def sample_camera(camera_data_mode, n, device='cuda'):
         vertical_mean = (math.pi / 180) * 80
         mode = 'uniform'
         radius_range = [1.2, 1.2]
+    elif camera_data_mode == 'relief-camera-mode':
+        horizontal_stddev = global_variables.kappa[0]
+        vertical_stddev = global_variables.kappa[1]
+
+        horizontal_mean = global_variables.polar_loc[0]
+        vertical_mean = global_variables.polar_loc[1]
+        mode = 'von_mises'
+        radius_range = [1.2, 1.2]
 
     else:
         raise NotImplementedError
@@ -98,6 +108,11 @@ def sample_camera_positions(
         v = ((torch.rand((n, 1), device=device) - .5) * 2 * v_stddev + v_mean)
         v = torch.clamp(v, 1e-5, 1 - 1e-5)
         phi = torch.arccos(1 - 2 * v)
+
+    elif mode == 'von_mises':
+        theta_dist = torch.distributions.von_mises.VonMises(horizontal_mean * math.pi, horizontal_stddev)
+        phi_dist = torch.distributions.von_mises.VonMises(vertical_mean * math.pi, vertical_stddev)
+        theta, phi = theta_dist.sample((n, 1)).to(device), phi_dist.sample((n, 1)).to(device)
     else:
         raise NotImplementedError
     phi = torch.clamp(phi, 1e-5, math.pi - 1e-5)
