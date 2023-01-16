@@ -243,8 +243,40 @@ class ImageFolderDataset(Dataset):
             self.img_list = all_img_list
             self.mask_list = all_mask_list
 
+        elif data_camera_mode == 'relief':
+            print('==> use relief data')
+            folder_list = sorted(os.listdir(root))
+            split_name = './3dgan_data_split/relief/%s.txt' % (split)
+            if split == 'all':
+                split_name = './3dgan_data_split/relief.txt'
+
+            valid_folder_list = []
+            with open(split_name, 'r') as f:
+                all_line = f.readlines()
+                for l in all_line:
+                    valid_folder_list.append(l.strip())
+            valid_folder_list = set(valid_folder_list)
+            useful_folder_list = set(folder_list).intersection(valid_folder_list)
+            folder_list = sorted(list(useful_folder_list))
+
+            print('==> use shapenet folder number %s' % (len(folder_list)))
+            folder_list = [os.path.join(root, f) for f in folder_list]
+            all_img_list = []
+            all_mask_list = []
+
+            for folder in folder_list:
+                rgb_list = sorted(os.listdir(folder))
+                rgb_list = [n for n in rgb_list if n.endswith('.png') or n.endswith('.jpg')]
+                rgb_file_name_list = [os.path.join(folder, n) for n in rgb_list]
+                all_img_list.extend(rgb_file_name_list)
+                all_mask_list.extend(rgb_list)
+
+            self.img_list = all_img_list
+            self.mask_list = all_mask_list
+
         else:
             raise NotImplementedError
+
         self.img_size = resolution
         self._type = 'dir'
         self._all_fnames = self.img_list
@@ -285,9 +317,8 @@ class ImageFolderDataset(Dataset):
     def __getitem__(self, idx):
         fname = self._image_fnames[self._raw_idx[idx]]
         if self.data_camera_mode == 'shapenet_car' or self.data_camera_mode == 'shapenet_chair' \
-                or self.data_camera_mode == 'renderpeople' \
-                or self.data_camera_mode == 'shapenet_motorbike' or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal' \
-                :
+                or self.data_camera_mode == 'renderpeople'  or self.data_camera_mode == 'shapenet_motorbike' \
+                or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal':
             ori_img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
             img = ori_img[:, :, :3][..., ::-1]
             mask = ori_img[:, :, 3:4]
@@ -301,12 +332,31 @@ class ImageFolderDataset(Dataset):
                     or self.data_camera_mode == 'renderpeople' or self.data_camera_mode == 'shapenet_motorbike' \
                     or self.data_camera_mode == 'ts_house' or self.data_camera_mode == 'ts_animal':
                 if not os.path.exists(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy')):
-                    print('==> not found camera root')
+                    print('==> not found camera root: ', os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy'))
                 else:
                     rotation_camera = np.load(os.path.join(self.camera_root, syn_idx, obj_idx, 'rotation.npy'))
                     elevation_camera = np.load(os.path.join(self.camera_root, syn_idx, obj_idx, 'elevation.npy'))
                     condinfo[0] = rotation_camera[img_idx] / 180 * np.pi
                     condinfo[1] = (90 - elevation_camera[img_idx]) / 180.0 * np.pi
+        elif self.data_camera_mode == 'relief':
+            ori_img = cv2.imread(fname, cv2.IMREAD_UNCHANGED)
+            img = ori_img[:, :, :3][..., ::-1]
+            mask = ori_img[:, :, 3:4]
+            condinfo = np.zeros(2)
+            fname_list = fname.split('/')
+            img_idx = int(fname_list[-1].split('.')[0])
+            obj_idx = fname_list[-2]
+            #syn_idx = fname_list[-3]
+
+            if not os.path.exists(os.path.join(self.camera_root, obj_idx, 'rotation.npy')):
+                print('==> not found camera root: ', os.path.join(self.camera_root, obj_idx, 'rotation.npy'))
+            else:
+                rotation_camera = np.load(os.path.join(self.camera_root, obj_idx, 'rotation.npy'))
+                elevation_camera = np.load(os.path.join(self.camera_root, obj_idx, 'elevation.npy'))
+                condinfo[0] = rotation_camera[img_idx] / 180 * np.pi
+                condinfo[1] = (90 - elevation_camera[img_idx]) / 180.0 * np.pi
+
+
         else:
             raise NotImplementedError
 
