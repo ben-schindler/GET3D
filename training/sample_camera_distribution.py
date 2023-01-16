@@ -62,6 +62,14 @@ def sample_camera(camera_data_mode, n, device='cuda'):
         mode = 'uniform'
         radius_range = [1.2, 1.2]
 
+    elif camera_data_mode == 'relief':
+        horizontal_stddev = math.pi  # here means horizontal rotation
+        vertical_stddev = (math.pi / 180) * 15
+        horizontal_mean = math.pi  ######## [horizon range [0, 2pi]]
+        vertical_mean = (math.pi / 180) * 75
+        mode = 'uniform'
+        radius_range = [1.2, 1.2]
+
     else:
         raise NotImplementedError
 

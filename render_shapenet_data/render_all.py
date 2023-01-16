@@ -38,7 +38,7 @@ scale_list = [
 for synset, obj_scale in zip(synset_list, scale_list):
     file_list = sorted(os.listdir(os.path.join(dataset_folder, synset)))
     for idx, file in enumerate(file_list):
-        render_cmd = '%s -b -P render_shapenet.py -- --output %s %s  --scale %f --views 24 --resolution 1024 >> tmp.out' % (
+        render_cmd = "%s -b -P render_shapenet.py -- --output %s %s  --scale %f --views 24 --resolution 1024 >> tmp.out" % (
             blender_root, save_folder, os.path.join(dataset_folder, synset, file, 'model.obj'), obj_scale
         )
         os.system(render_cmd)
