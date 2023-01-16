@@ -63,7 +63,7 @@ def sample_camera(camera_data_mode, n, device='cuda'):
         vertical_mean = (math.pi / 180) * 80
         mode = 'uniform'
         radius_range = [1.2, 1.2]
-    elif camera_data_mode == 'relief-camera-mode':
+    elif camera_data_mode == 'relief':
         horizontal_stddev = global_variables.kappa[0]
         vertical_stddev = global_variables.kappa[1]
 

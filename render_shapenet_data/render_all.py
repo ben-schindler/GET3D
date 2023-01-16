@@ -41,7 +41,6 @@ synset_list = [
     '02958343',  # Car
     '03001627',  # Chair
     '03790512'  # Motorbike
-    # 'reliefs'  # Reliefs
 ]
 scale_list = [
     0.9,

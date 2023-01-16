@@ -10,13 +10,17 @@ import os
 import argparse
 from multiprocessing.pool import ThreadPool
 
-def blender_job(blender_root, save_folder, dataset_folder, synset, file, obj_scale, views):
-    render_cmd = '%s -b -P render_shapenet.py -- --output %s %s  --scale %f --views %d --resolution 1024 >> tmp.out' % (
-        blender_root, 
-        save_folder, 
-        os.path.join(dataset_folder, synset, file, 'model.obj'), 
-        obj_scale, 
-        views)
+def blender_job(blender_root, save_folder, dataset_folder, synset, file, obj_scale, views, kappa, polar_loc):
+    render_cmd = '"%s" -b -P render_shapenet.py -- --output %s %s  --scale %f --views 24 --resolution 1024 --use_von_mises_camera %s --kappa %s --polar_loc %s >> tmp.out' % (
+        blender_root,
+        save_folder,
+        os.path.join(dataset_folder, synset, file, 'model.obj'),
+        obj_scale,
+        views,
+        args.use_von_mises_camera,
+        " ".join(str(x) for x in kappa),
+        " ".join(str(x) for x in polar_loc)
+    )
     os.system(render_cmd)
 
 synset_list = [
@@ -42,6 +46,17 @@ parser.add_argument(
     '--worker', type=int, default=1,
     help='number of blender-workers')
 args = parser.parse_args()
+
+###### Added for reliefs
+parser.add_argument(
+    '--use_von_mises_camera', type=bool, default=False,
+    help='Whether we are using the special relief camera')
+parser.add_argument(
+    '--kappa', nargs=2, type=float, default=(1.0, 1.0),
+    help='If we are using reliefs, the concentrations of the von mises distributions')
+parser.add_argument(
+    '--polar_loc', nargs=2, type=float, default=(1.0, 0.0),
+    help='If we are using reliefs, the centers of the von mises distributions')
 
 save_folder = args.save_folder
 dataset_folder = args.dataset_folder

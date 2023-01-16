@@ -170,7 +170,7 @@ class ImageFolderDataset(Dataset):
         if data_camera_mode == 'shapenet_car' or data_camera_mode == 'shapenet_chair' \
                 or data_camera_mode == 'renderpeople' or data_camera_mode == 'shapenet_motorbike' \
                 or data_camera_mode == 'ts_house' \
-                or data_camera_mode == 'ts_animal' or data_camera_mode == 'relief-camera-mode':
+                or data_camera_mode == 'ts_animal' or data_camera_mode == 'relief':
             print('==> use shapenet dataset')
             if not os.path.exists(root):
                 print('==> ERROR!!!! THIS SHOULD ONLY HAPPEN WHEN USING INFERENCE')
