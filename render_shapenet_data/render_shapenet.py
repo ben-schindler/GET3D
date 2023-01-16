@@ -10,7 +10,7 @@ import argparse, sys, os, math, re
 import bpy
 from mathutils import Vector, Matrix
 import numpy as np
-import json 
+import json
 
 parser = argparse.ArgumentParser(description='Renders given obj file by rotation a camera around it.')
 parser.add_argument(
@@ -34,6 +34,17 @@ parser.add_argument(
 parser.add_argument(
     '--engine', type=str, default='CYCLES',
     help='Blender internal engine for rendering. E.g. CYCLES, BLENDER_EEVEE, ...')
+
+###### Added for reliefs
+parser.add_argument(
+    '--use_von_mises_camera', type=bool, default=False,
+    help='Whether we are using the special relief camera')
+parser.add_argument(
+    '--kappa', nargs=2, type=float, default=(1.0, 1.0),
+    help='If we are using reliefs, the concentrations of the von mises distributions')
+parser.add_argument(
+    '--polar_loc', nargs=2, type=float, default=(1.0, 0.0),
+    help='If we are using reliefs, the centers of the von mises distributions')
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 args = parser.parse_args(argv)
@@ -222,7 +233,7 @@ stepsize = 360.0 / args.views
 rotation_mode = 'XYZ'
 
 model_identifier = os.path.split(os.path.split(args.obj)[0])[1]
-synset_idx = args.obj.split('/')[-3]
+synset_idx = args.obj.split('/')[-3]  # \\ delimiter for windows
 
 img_follder = os.path.join(os.path.abspath(args.output_folder), 'img', synset_idx, model_identifier)
 camera_follder = os.path.join(os.path.abspath(args.output_folder), 'camera', synset_idx, model_identifier)
@@ -230,10 +241,17 @@ camera_follder = os.path.join(os.path.abspath(args.output_folder), 'camera', syn
 os.makedirs(img_follder, exist_ok=True)
 os.makedirs(camera_follder, exist_ok=True)
 
-rotation_angle_list = np.random.rand(args.views)
-elevation_angle_list = np.random.rand(args.views)
-rotation_angle_list = rotation_angle_list * 360
-elevation_angle_list = elevation_angle_list * 30
+if not args.use_von_mises_camera:
+    rotation_angle_list = np.random.rand(args.views)
+    elevation_angle_list = np.random.rand(args.views)
+    rotation_angle_list = rotation_angle_list * 360
+    elevation_angle_list = elevation_angle_list * 30
+else:
+    rotation_angle_list = np.rad2deg(
+        np.random.vonmises(args.polar_loc[0] * np.pi, args.kappa[0], size=args.views) + np.pi)
+    elevation_angle_list = np.rad2deg(
+        np.random.vonmises(args.polar_loc[1] * np.pi, args.kappa[1], size=args.views) + np.pi)
+
 np.save(os.path.join(camera_follder, 'rotation'), rotation_angle_list)
 np.save(os.path.join(camera_follder, 'elevation'), elevation_angle_list)
 

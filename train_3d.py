@@ -19,6 +19,7 @@ from torch_utils import training_stats
 from torch_utils import custom_ops
 from training import inference_3d
 
+import global_variables
 
 # ----------------------------------------------------------------------------
 def subprocess_fn(rank, c, temp_dir):
@@ -169,6 +170,11 @@ def parse_comma_separated_list(s):
 @click.option('--camera_path', help='Path to the camera root', metavar='[DIR]', type=str, default='./tmp')
 @click.option('--img_res', help='The resolution of image', metavar='INT', type=click.IntRange(min=1), default=1024)
 @click.option('--data_camera_mode', help='The type of dataset we are using', type=str, default='shapenet_car', show_default=True)
+
+###### Added for reliefs
+@click.option('--kappa', help='If we are using reliefs, the concentrations of the von mises distributions', type=(float, float), default=(1.0, 1.0), show_default=True)
+@click.option('--polar_loc', help='If we are using reliefs, the centers of the von mises distributions', type=(float, float), default=(1.0, 0.0), show_default=True)
+
 @click.option('--use_shapenet_split', help='whether use the training split or all the data for training', metavar='BOOL', type=bool, default=False, show_default=False)
 ### Configs for 3D generator##########
 @click.option('--use_style_mixing', help='whether use style mixing for generation during inference', metavar='BOOL', type=bool, default=True, show_default=False)
@@ -262,6 +268,8 @@ def main(**kwargs):
     c.G_kwargs.use_tri_plane = opts.use_tri_plane
     c.D_kwargs.data_camera_mode = opts.data_camera_mode
     c.D_kwargs.add_camera_cond = opts.add_camera_cond
+
+    global_variables.kappa, global_variables.polar_loc = opts.kappa, opts.polar_loc
 
     c.G_kwargs.tet_res = opts.tet_res
 
