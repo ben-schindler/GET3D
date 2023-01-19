@@ -40,7 +40,7 @@ parser.add_argument(
     '--use_von_mises_camera', type=bool, default=False,
     help='Whether we are using the special relief camera')
 parser.add_argument(
-    '--kappa', nargs=2, type=float, default=(1.0, 1.0),
+    '--kappa', nargs=2, type=float, default=(1.0, 5.0),
     help='If we are using reliefs, the concentrations of the von mises distributions')
 parser.add_argument(
     '--polar_loc', nargs=2, type=float, default=(1.0, 0.0),
